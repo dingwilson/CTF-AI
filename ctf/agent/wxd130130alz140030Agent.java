@@ -2,95 +2,117 @@ package ctf.agent;
 
 import ctf.common.AgentEnvironment;
 import ctf.agent.Agent;
-
 import ctf.common.AgentAction;
 
-public class wxd130130alz140030Agent extends Agent 
-{   
-    boolean firstmove=true;
-    int northagent=true; // 1 designates north agent, 2 designates southagent
-    static boolean waiting=false;
-    
+public class wxd130130alz140030Agent extends Agent {   
+    int agent = 0; // 1 designates north agent, 2 designates southagent
+
+    int stepsToInitialize = 0;  // counter to find size of map
+
+    int agentLocationX; // current x location of agent
+    int agentLocationY; // current y location of agent
+
+    boolean initializing = true;    // initialization phase
+    boolean initializeMine = false; // planted mine
     
     public static Tile[][] map;    // map of environment, initialize after hitting flag
     
-    int agentLocationX;
-    int agentLocationY;
-    
     public int getMove(AgentEnvironment inEnvironment) {
-        if(firstmove)
-        {        
-             if (inEnvironment.isFlagNorth(OUR_TEAM, true)&&!inEnvironment.isObstacleNorthImmediate())           
-             {
-                 northagent=2;      
-                 return AgentAction.MOVE_NORTH;  
-             }
-             
-             if (inEnvironment.isFlagSouth(OUR_TEAM, true)&&!inEnvironment.isObstacleSouthImmediate()) 
-             {
-                 northagent=1;
-                 return AgentAction.MOVE_SOUTH;
-             }
-             
-             if (inEnvironment.isObstacleSouthImmediate())
-             {
-                 if (!waiting)
-                 {
-                     waiting=true;
-                     return AgentAction.DO_NOTHING;
-                 }
-                  if (waiting)
-                {
-                     waiting=false;
-                     return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;         
-                }       
-                 
-             }
-         
-             if (inEnvironment.isObstacleNorthImmediate())
-             {
-             if (!waiting)
-                 {
-                     waiting=true;
-                     return AgentAction.DO_NOTHING;
-                 }
-                if (waiting)
-                {
-                     waiting=false;
-                     return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;         
-                }                        
-             }    
+        if (initializing) {
+            if (agent == 0) {   // set agent number if not set
+                agent = getAgentNumber(inEnvironment);
+            }
+
+            if (agent == 1) {
+                if (inEnvironment.isFlagSouth(inEnvironment.OUR_TEAM, true)) {
+                    if (!initializeMine) {
+                        initializeMine = true;
+                        return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
+                    } else {
+                        // TODO: figure out what side (left or right) of map we are on
+                        // TODO: move west or east 2x, then south
+                    }
+                } else {
+                    stepsToInitialize++;
+                    return AgentAction.MOVE_SOUTH;
+                }
+            } else if (agent == 2) {
+                if (inEnvironment.isFlagNorth(inEnvironment.OUR_TEAM, true)) {
+                    if (!initializeMine) {
+                        initializeMine = true;
+                        return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
+                    } else {
+                        // TODO: figure out what side (left or right) of map we are on
+                        // TODO: move west or east 1x, then plant mine, then up one, then plant mine, then up
+                    }
+                } else {
+                    stepsToInitialize++;
+                    return AgentAction.MOVE_NORTH;
+                }
+            }
+
+            return AgentAction.MOVE_WEST;
         } 
         
         else {
+            didAgentDie(inEnvironment);
             getEnvironmentInfo(inEnvironment);
-        
-            heuristic1();
-            ....
-            heuristicn();
-        
-            makeMove();
+
+            // make move
+        }
+
+        return AgentAction.DO_NOTHING;  // TODO: remove
+    }
+
+    private int getAgentNumber(AgentEnvironment inEnvironment) {
+        if (inEnvironment.isFlagSouth(inEnvironment.OUR_TEAM, false)) {
+            return 1;
+        } else if (inEnvironment.isFlagNorth(inEnvironment.OUR_TEAM, false)) {
+            return 2;
+        } else {
+            return 3;   // something went wrong. This should NEVER happen.
         }
     }
 
-    private Tile getEnvironmentInfo(AgentEnvironment inEnvironment, boolean firstmove) {
-        if (firstmove) {
-            return null;
-        }
-        
-        
+    // update all available info for current location in environment
+    private void getEnvironmentInfo(AgentEnvironment inEnvironment) {
+        // TODO: check adjacent spots for obstacles. add to Tile array if found (only after initialization has ended)
     }
 
+    // checks if agent died. if so, reset agent location, initializing, etc.
+    private void didAgentDie(AgentEnvironment inEnvironment) {
+        if (!initializing) {    // should not run this while initializing
+            if (agent == 1) {
+                if (inEnvironment.isFlagSouth(inEnvironment.OUR_TEAM, false)) { // died
+                    // TODO: reset agentLocationX
+                    // TODO: reset agentLocationY
+
+                    resetDeadAgent();
+                }
+            } else if (agent == 2) {
+                if (inEnvironment.isFlagNorth(inEnvironment.OUR_TEAM, false)) { // died
+                    // TODO: reset agentLocationX
+                    // TODO: reset agentLocationY
+
+                    resetDeadAgent();
+                }
+            }
+        }
+    }
+
+    // generic death reset things (specific things belong in didAgentDie())
+    private void resetDeadAgent() {
+        initializing = true;
+        initializeMine = false;
+    }
+
+    // Tile object to hold whether each tile is an obstacle or a base
     public class Tile {
-        // public boolean goalNorth;    // is goal north?
-        // public boolean goalSouth;    // is goal south?
-        // public boolean goalEast;    // is goal east?
-        // public boolean goalWest;    // is goal west?
-        
         public boolean isObstacle;    // is tile obstacle?
         public boolean isBase;    // is tile a base?
+        public boolean isMine;      // is tile mine?
         
-        public Tile() {
+        public Tile() { // init
             
         }
     }
