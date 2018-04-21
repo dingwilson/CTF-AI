@@ -52,11 +52,9 @@ public class wxd130130alz140030Agent extends Agent {
             }
 
             return AgentAction.MOVE_WEST;
-        } 
-        
-        else {
-            didAgentDie(inEnvironment);
-            getEnvironmentInfo(inEnvironment);
+        } else {
+            didAgentDie(inEnvironment); // check if agent has died. 
+            getEnvironmentInfo(inEnvironment, agentLocationX, agentLocationY);
 
             // make move
         }
@@ -75,8 +73,24 @@ public class wxd130130alz140030Agent extends Agent {
     }
 
     // update all available info for current location in environment
-    private void getEnvironmentInfo(AgentEnvironment inEnvironment) {
-        // TODO: check adjacent spots for obstacles. add to Tile array if found (only after initialization has ended)
+    private void getEnvironmentInfo(AgentEnvironment inEnvironment, int agentLocationX, int agentLocationY) {
+        if (!initializing) {    // should not run this while initializing
+            if (inEnvironment.isObstacleNorthImmediate() && agentLocationY != 0) {
+                map[agentLocationX][agentLocationY - 1].isObstacle = true;
+            }
+
+            if (inEnvironment.isObstacleSouthImmediate()) {  // TODO: need to add "&& agentLocationY != <value of N>" to if statement
+                map[agentLocationX][agentLocationY + 1].isObstacle = true;
+            }
+
+            if (inEnvironment.isObstacleEastImmediate()) {  // TODO: need to add "&& agentLocationX != <value of N>" to if statement
+                map[agentLocationX + 1][agentLocationY].isObstacle = true;
+            }
+
+            if (inEnvironment.isObstacleWestImmediate() && agentLocationX != 0) {
+                map[agentLocationX - 1][agentLocationY].isBostacle = true;
+            }
+        }
     }
 
     // checks if agent died. if so, reset agent location, initializing, etc.
