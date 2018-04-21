@@ -88,7 +88,7 @@ public class wxd130130alz140030Agent extends Agent {
             }
 
             if (inEnvironment.isObstacleWestImmediate() && agentLocationX != 0) {
-                map[agentLocationX - 1][agentLocationY].isBostacle = true;
+                map[agentLocationX - 1][agentLocationY].isObstacle = true;
             }
         }
     }
