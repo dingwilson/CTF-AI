@@ -124,7 +124,6 @@ public class wxd130130alz140030Agent extends Agent {
     public class Tile {
         public boolean isObstacle;    // is tile obstacle?
         public boolean isBase;    // is tile a base?
-        public boolean isMine;      // is tile mine?
         
         public Tile() { // init
             
