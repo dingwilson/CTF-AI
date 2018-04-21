@@ -77,18 +77,26 @@ public class wxd130130alz140030Agent extends Agent {
         if (!initializing) {    // should not run this while initializing
             if (inEnvironment.isObstacleNorthImmediate() && agentLocationY != 0) {
                 map[agentLocationX][agentLocationY - 1].isObstacle = true;
+            } else {
+                map[agentLocationX][agentLocationY - 1].isObstacle = false;
             }
 
             if (inEnvironment.isObstacleSouthImmediate()) {  // TODO: need to add "&& agentLocationY != <value of N>" to if statement
                 map[agentLocationX][agentLocationY + 1].isObstacle = true;
+            } else {
+                map[agentLocationX][agentLocationY + 1].isObstacle = false;
             }
 
             if (inEnvironment.isObstacleEastImmediate()) {  // TODO: need to add "&& agentLocationX != <value of N>" to if statement
                 map[agentLocationX + 1][agentLocationY].isObstacle = true;
+            } else {
+                map[agentLocationX + 1][agentLocationY].isObstacle = false;
             }
 
             if (inEnvironment.isObstacleWestImmediate() && agentLocationX != 0) {
                 map[agentLocationX - 1][agentLocationY].isObstacle = true;
+            } else {
+                map[agentLocationX - 1][agentLocationY].isObstacle = false;
             }
         }
     }
