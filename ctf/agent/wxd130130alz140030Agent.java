@@ -4,62 +4,79 @@ import ctf.common.AgentEnvironment;
 import ctf.agent.Agent;
 import ctf.common.AgentAction;
 
-public class wxd130130alz140030Agent extends Agent {   
+public class wxd130130alz140030Agent extends Agent {
     int agent = 0; // 1 designates north agent, 2 designates southagent
-
-    int stepsToInitialize = 0;  // counter to find size of map
 
     int agentLocationX; // current x location of agent
     int agentLocationY; // current y location of agent
 
     boolean initializing = true;    // initialization phase
-    boolean initializeMine = false; // planted mine
     
     public static Tile[][] map;    // map of environment, initialize after hitting flag
-    
+    public static int mapSizeN; // the value of N, given the NxN map
+
+    public static Boolean isEast;   // figure out east vs west
+
+    public static int agent1NumTiles = 1;   // number of steps for agent 1 to hit flag
+    public static int agent2NumTiles = 1;   // number of steps for agent 2 to hit flag
+    public static boolean agent1DoneInitializing = false;   // is agent 1 done finding numTiles
+    public static boolean agent2DoneInitializing = false;   // is agent 2 done finding numTiles
+
     public int getMove(AgentEnvironment inEnvironment) {
         if (initializing) {
             if (agent == 0) {   // set agent number if not set
                 agent = getAgentNumber(inEnvironment);
             }
 
+            if (isEast == null) {   // find out spawn loc in east or west if null
+                isEast = isAgentEast(inEnvironment);
+            }
+
             if (agent == 1) {
                 if (inEnvironment.isFlagSouth(inEnvironment.OUR_TEAM, true)) {
-                    if (!initializeMine) {
-                        initializeMine = true;
-                        return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
-                    } else {
-                        // TODO: figure out what side (left or right) of map we are on
-                        // TODO: move west or east 2x, then south
-                    }
+                    agent1DoneInitializing = true;
+
+                    // TODO: logic to place mines for agent 1, then set initialize to false
+
                 } else {
-                    stepsToInitialize++;
+                    agent1NumTiles++;
                     return AgentAction.MOVE_SOUTH;
                 }
             } else if (agent == 2) {
                 if (inEnvironment.isFlagNorth(inEnvironment.OUR_TEAM, true)) {
-                    if (!initializeMine) {
-                        initializeMine = true;
-                        return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
-                    } else {
-                        // TODO: figure out what side (left or right) of map we are on
-                        // TODO: move west or east 1x, then plant mine, then up one, then plant mine, then up
-                    }
+                    agent2DoneInitializing = true;
+
+                    // TODO: logic to place mines for agent 2, then set initialize to false
+
                 } else {
-                    stepsToInitialize++;
+                    agent2NumTiles++;
                     return AgentAction.MOVE_NORTH;
+                }
+            } else {
+                return AgentAction.DO_NOTHING;  // this should never occur
+            }
+        } else {
+            if (map == null && agent1DoneInitializing && agent2DoneInitializing) {  // if map is null, instantiate map
+                mapSizeN = agent1NumTiles + agent2NumTiles + 1;    // agent1 + agent2 + flag
+                map = new Tile[mapSizeN][mapSizeN];   // create map object
+
+                if (agent == 1) {
+
+                } else if (agent == 2) {
+
                 }
             }
 
-            return AgentAction.MOVE_WEST;
-        } else {
-            didAgentDie(inEnvironment); // check if agent has died. 
-            getEnvironmentInfo(inEnvironment, agentLocationX, agentLocationY);
+            didAgentDie(inEnvironment); // check if agent has died.
 
-            // make move
+            if (map != null) {
+                getEnvironmentInfo(inEnvironment, agentLocationX, agentLocationY);
+            }
+
+            // TODO: this occurs after initialization. make move - heuristics go here
         }
 
-        return AgentAction.DO_NOTHING;  // TODO: remove
+        return AgentAction.DO_NOTHING;  // this should never occur
     }
 
     private int getAgentNumber(AgentEnvironment inEnvironment) {
@@ -81,13 +98,13 @@ public class wxd130130alz140030Agent extends Agent {
                 map[agentLocationX][agentLocationY - 1].isObstacle = false;
             }
 
-            if (inEnvironment.isObstacleSouthImmediate()) {  // TODO: need to add "&& agentLocationY != <value of N>" to if statement
+            if (inEnvironment.isObstacleSouthImmediate() && agentLocationY != mapSizeN - 1) {
                 map[agentLocationX][agentLocationY + 1].isObstacle = true;
             } else {
                 map[agentLocationX][agentLocationY + 1].isObstacle = false;
             }
 
-            if (inEnvironment.isObstacleEastImmediate()) {  // TODO: need to add "&& agentLocationX != <value of N>" to if statement
+            if (inEnvironment.isObstacleEastImmediate() && agentLocationX != mapSizeN - 1) {
                 map[agentLocationX + 1][agentLocationY].isObstacle = true;
             } else {
                 map[agentLocationX + 1][agentLocationY].isObstacle = false;
@@ -101,20 +118,41 @@ public class wxd130130alz140030Agent extends Agent {
         }
     }
 
+    // finds out if agent is east or west starting location
+    private Boolean isAgentEast(AgentEnvironment inEnvironment) {
+        if (inEnvironment.isObstacleEastImmediate() && !inEnvironment.isObstacleWestImmediate()) {
+            return false;
+        } else if (inEnvironment.isObstacleWestImmediate() && !inEnvironment.isObstacleEastImmediate()) {
+            return true;
+        }
+
+        return null;
+    }
+
     // checks if agent died. if so, reset agent location, initializing, etc.
     private void didAgentDie(AgentEnvironment inEnvironment) {
         if (!initializing) {    // should not run this while initializing
             if (agent == 1) {
                 if (inEnvironment.isFlagSouth(inEnvironment.OUR_TEAM, false)) { // died
-                    // TODO: reset agentLocationX
-                    // TODO: reset agentLocationY
+                    if (isEast) {
+                        agentLocationX = mapSizeN - 1;
+                    } else {
+                        agentLocationX = 0;
+                    }
+
+                    agentLocationY = 0;
 
                     resetDeadAgent();
                 }
             } else if (agent == 2) {
                 if (inEnvironment.isFlagNorth(inEnvironment.OUR_TEAM, false)) { // died
-                    // TODO: reset agentLocationX
-                    // TODO: reset agentLocationY
+                    if (isEast) {
+                        agentLocationX = mapSizeN - 1;
+                    } else {
+                        agentLocationX = 0;
+                    }
+
+                    agentLocationY = mapSizeN - 1;
 
                     resetDeadAgent();
                 }
@@ -125,7 +163,6 @@ public class wxd130130alz140030Agent extends Agent {
     // generic death reset things (specific things belong in didAgentDie())
     private void resetDeadAgent() {
         initializing = true;
-        initializeMine = false;
     }
 
     // Tile object to hold whether each tile is an obstacle or a base
