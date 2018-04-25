@@ -22,16 +22,16 @@ public class wxd130130alz140030Agent extends Agent {
     private boolean useSimpleAgent = false;  // use simple agent (if all else fails...)
 
     // hardcoded check/start path for Agent 1
-    private final String[] startEast = new String[]{"down", "left", "left", "left"};
-    private final String[] startWest = new String[]{"down", "right", "right", "right"};
+    private final String[] startEast = new String[]{"down", "left", "left", "left", "nothing"};
+    private final String[] startWest = new String[]{"down", "right", "right", "right", "nothing"};
 
     // hardcoded paths for simple and empty (es) maps
-    private final String[] esEast = new String[]{"left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "up", "up", "up", "right", "right", "right", "right", "right", "right", "right", "right", "right", "down"};
-    private final String[] esWest = new String[]{"right", "right", "right", "right", "right", "right", "right","right", "right", "up", "up", "up", "up", "up", "left", "left", "left", "left", "left", "left", "left", "left", "left", "down"};
+    private final String[] esEast = new String[]{"left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "up", "up", "up", "right", "right", "right", "right", "right", "right", "right", "right", "right", "down", "nothing"};
+    private final String[] esWest = new String[]{"right", "right", "right", "right", "right", "right", "right","right", "right", "up", "up", "up", "up", "up", "left", "left", "left", "left", "left", "left", "left", "left", "left", "down", "nothing"};
 
     // hardcoded paths for x, wall, traps (xwt) maps
-    private final String[] xwtEast = new String[]{"left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "up", "up", "down", "down", "down", "down", "right", "right", "right", "right", "right", "right", "right", "right", "right", "up", "up", "up","left", "left", "up", "up", "right", "right", "down"};
-    private final String[] xwtWest = new String[]{"right", "right", "right", "right", "right", "right", "right", "right", "right", "up", "up", "up", "up", "down", "down", "down", "down","left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "up", "right", "right", "up", "up", "left", "left", "down"};
+    private final String[] xwtEast = new String[]{"left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "up", "up", "down", "down", "down", "down", "right", "right", "right", "right", "right", "right", "right", "right", "right", "up", "up", "left", "up", "left", "up", "up", "right", "right", "right", "down", "nothing"};
+    private final String[] xwtWest = new String[]{"right", "right", "right", "right", "right", "right", "right", "right", "right", "up", "up", "up", "up", "down", "down", "down", "down","left", "left", "left", "left", "left", "left", "left", "left", "left", "up", "up", "right", "up", "right", "up", "up", "left", "left", "left", "down", "nothing"};
 
     private static String[] path;  // chosen path
 
@@ -44,6 +44,7 @@ public class wxd130130alz140030Agent extends Agent {
 
         if (initializing) {
             if (agent == 0) {   // get agent number if not set
+                clock = 0;
                 potentialMaps = setupPotentialMaps();
 
                 agent = getAgentNumber(inEnvironment);
@@ -58,27 +59,19 @@ public class wxd130130alz140030Agent extends Agent {
                 // TESTING FOR X
                 if ((clock == 1 && isSpawnEast && inEnvironment.isObstacleWestImmediate()) || (clock == 1 && !isSpawnEast && inEnvironment.isObstacleEastImmediate())) {
                     if (isSpawnEast) {
-                        path = new String[xwtEast.length];
                         path = Arrays.copyOf(xwtEast,xwtEast.length);
                     } else {
-                        path = new String[xwtWest.length];
                         path = Arrays.copyOf(xwtWest,xwtWest.length);
                     }
-                    
-                    System.out.println("the map is X");
 
                     initializing = false;
-                    clock = 0;
-                    return AgentAction.MOVE_NORTH;
                 }
             
-                // TESTING FOR ???
+                // TESTING FOR TRAPS
                 if ((clock == 2 && isSpawnEast && inEnvironment.isObstacleWestImmediate()) || (clock == 2 && !isSpawnEast && inEnvironment.isObstacleEastImmediate())) {
                     if (isSpawnEast) {
-                        path = new String[xwtEast.length];
                         path = Arrays.copyOf(xwtEast,xwtEast.length);
                     } else {
-                        path = new String[xwtWest.length];
                         path = Arrays.copyOf(xwtWest,xwtWest.length);
                     }
 
@@ -86,94 +79,102 @@ public class wxd130130alz140030Agent extends Agent {
                 }
 
                 // TESTING FOR SIMPLE
+                // TODO: Loses to SimpleAgent
                 if (clock == 3 && inEnvironment.isObstacleSouthImmediate()) {
-                    System.out.println("SimpleMap");
-                    initializing = false;
-                    
                     if (isSpawnEast) {
-                        path = new String[esEast.length];
                         path = Arrays.copyOf(esEast, esEast.length);
                     } else {
-                        path = new String[esWest.length];
                         path = Arrays.copyOf(esWest, esWest.length);
                     }
+
+                    initializing = false;
                 }
 
-                // TESTING FOR ???
                 if (clock == 4) {
+                    // TESTING FOR WALL
                     if ((isSpawnEast && inEnvironment.isObstacleWestImmediate()) || !isSpawnEast && inEnvironment.isObstacleEastImmediate()) {
                         if (isSpawnEast) {
-                            path = new String[xwtEast.length];
                             path = Arrays.copyOf(xwtEast,xwtEast.length);
                         } else {
-                            path = new String[xwtWest.length];
                             path = Arrays.copyOf(xwtWest,xwtWest.length);
                         }
+                    } else {    // OTHERWISE EMPTY
+                        // TODO: Loses to SimpleAgent
+                        if (isSpawnEast) {
+                            path = Arrays.copyOf(esEast, esEast.length);
+                        } else {
+                            path = Arrays.copyOf(esWest, esWest.length);
+                        }
                     }
-                } else if (clock == 4) {    // OTHERWISE EMPTY
-                    System.out.println("Empty");
+
                     initializing = false;
+                }
+
+                if (initializing == false) {
+                    clock = 0;
+                    return AgentAction.DO_NOTHING;
+                } else {
+                    if (clock >= startEast.length) {    // startEast.length == startWest.length
+                        useSimpleAgent = true;
+                        return simpleAgent(inEnvironment);
+                    }
+
+                    String move;
 
                     if (isSpawnEast) {
-                        path = new String[esEast.length];
-                        path = Arrays.copyOf(esEast, esEast.length);
+                        move = startEast[clock];
                     } else {
-                        path = new String[esWest.length];
-                        path = Arrays.copyOf(esWest, esWest.length);
-                    }    
-                }
+                        move = startWest[clock];
+                    }
 
-                String move;
+                    clock++;
 
-                if (isSpawnEast) {
-                    move = startEast[clock];
-                } else {
-                    move = startWest[clock];
-                }
-
-                clock++;
-
-                switch (move) {
-                    case "left":
-                        return AgentAction.MOVE_WEST;
-                    case "right":
-                        return AgentAction.MOVE_EAST;
-                    case "up":
-                        return AgentAction.MOVE_NORTH;
-                    case "down":
-                        return AgentAction.MOVE_SOUTH;
-                    default:
-                        return AgentAction.DO_NOTHING;
+                    switch (move) {
+                        case "left":
+                            return AgentAction.MOVE_WEST;
+                        case "right":
+                            return AgentAction.MOVE_EAST;
+                        case "up":
+                            return AgentAction.MOVE_NORTH;
+                        case "down":
+                            return AgentAction.MOVE_SOUTH;
+                        default:
+                            return AgentAction.DO_NOTHING;
+                    }
                 }
             } else if (agent == 2) {    // agent = 2 = south agent
                 return AgentAction.DO_NOTHING;
-                // TODO: Follow intial setup for agent 2
-
             } else {    // this should never happen...
                 useSimpleAgent = true;
                 return simpleAgent(inEnvironment);
             }
         } else {
-            String move = path[clock];
-            clock++;
-
             if (isAgentDead(inEnvironment)) {
                 clock = 0;
             }
 
+            if (clock >= path.length) {
+                useSimpleAgent = true;
+                return simpleAgent(inEnvironment);
+            }
+
+            String move = path[clock];
+            clock++;
+
             if (agent == 1) {
-                switch (move) {
-                    case "left":
-                        return AgentAction.MOVE_WEST;
-                    case "right":
-                        return AgentAction.MOVE_EAST;
-                    case "up":
-                        return AgentAction.MOVE_SOUTH;  // flipped for north agent
-                    case "down":
-                        return AgentAction.MOVE_NORTH;  // flipped for north agent
-                    default:
-                        return AgentAction.DO_NOTHING;
-                }
+                return AgentAction.DO_NOTHING;
+                // switch (move) {
+                //     case "left":
+                //         return AgentAction.MOVE_WEST;
+                //     case "right":
+                //         return AgentAction.MOVE_EAST;
+                //     case "up":
+                //         return AgentAction.MOVE_SOUTH;  // flipped for north agent
+                //     case "down":
+                //         return AgentAction.MOVE_NORTH;  // flipped for north agent
+                //     default:
+                //         return AgentAction.DO_NOTHING;
+                // }
             } else if (agent == 2) {
                 switch (move) {
                     case "left":
@@ -249,6 +250,10 @@ public class wxd130130alz140030Agent extends Agent {
 
     // checks if agent has died
     private boolean isAgentDead(AgentEnvironment inEnvironment) {
+        if (inEnvironment.hasFlag(inEnvironment.OUR_TEAM)) {
+            return false;
+        }
+
         return startingObstacles.equals(getObstacleString(inEnvironment));
     }
 
@@ -281,7 +286,7 @@ public class wxd130130alz140030Agent extends Agent {
 
     // check maps and remove impossible maps
     private void checkPotentialMaps() {
-        // TODO: Implement
+        // TODO: Implement checking (for secret map)
     }
 
     // create boolean array
