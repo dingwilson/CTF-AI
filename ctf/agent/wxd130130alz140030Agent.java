@@ -165,7 +165,13 @@ public class wxd130130alz140030Agent extends Agent {
                     // TODO: check obstacles against potential maps
                 }
             } else if (agent == 2) {    // agent = 2 = south agent
-                return AgentAction.DO_NOTHING;
+                clock++;
+
+                if (isSpawnEast) {
+                    return AgentAction.MOVE_WEST;
+                } else {
+                    return AgentAction.MOVE_EAST;
+                }
             } else {    // this should never happen...
                 useSimpleAgent = true;
                 return simpleAgent(inEnvironment);
