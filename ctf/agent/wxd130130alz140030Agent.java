@@ -12,7 +12,7 @@ public class wxd130130alz140030Agent extends Agent {
 
     private static boolean initializing = true;    // searching for map type
 
-    private static Boolean isSpawnEast;   // null = not found, true = east spawn, false = west spawn
+    private Boolean isSpawnEast;   // null = not found, true = east spawn, false = west spawn
 
     private int agentXLoc;  // current agent X location
     private int agentYLoc;  // current agent Y location
@@ -37,22 +37,42 @@ public class wxd130130alz140030Agent extends Agent {
 
     private int clock = 0;  // move clock
 
+    public wxd130130alz140030Agent() {
+        initializing = true;
+        potentialMaps = setupPotentialMaps();
+        path = new String[0];
+    }
+
     public int getMove(AgentEnvironment inEnvironment) {
         if (useSimpleAgent) {   // if simple agent...
             return simpleAgent(inEnvironment);
         }
 
         if (initializing) {
+            if (isSpawnEast == null) {  // get spawn location (if possible)
+                isSpawnEast = isSpawnEast(inEnvironment);
+            }
+
             if (agent == 0) {   // get agent number if not set
                 clock = 0;
                 potentialMaps = setupPotentialMaps();
+                startingObstacles = getObstacleString(inEnvironment);
 
                 agent = getAgentNumber(inEnvironment);
-                startingObstacles = getObstacleString(inEnvironment);
-            }
 
-            if (isSpawnEast == null) {  // get spawn location (if possible)
-                isSpawnEast = isSpawnEast(inEnvironment);
+                if (isSpawnEast) {
+                    agentXLoc = 9;
+                } else {
+                    agentXLoc = 0;
+                }
+
+                if (agent == 1) {
+                    agentYLoc = 0;
+                } else if (agent == 2) {
+                    agentYLoc = 9;
+                }
+
+                // TODO: check obstacles
             }
 
             if (agent == 1) {   // agent = 1 = north agent
@@ -141,6 +161,8 @@ public class wxd130130alz140030Agent extends Agent {
                         default:
                             return AgentAction.DO_NOTHING;
                     }
+                    // TODO: adjust agentXLoc and agentYLoc
+                    // TODO: check obstacles against potential maps
                 }
             } else if (agent == 2) {    // agent = 2 = south agent
                 return AgentAction.DO_NOTHING;
@@ -162,19 +184,8 @@ public class wxd130130alz140030Agent extends Agent {
             clock++;
 
             if (agent == 1) {
+                // TODO: maybe add defense?
                 return AgentAction.DO_NOTHING;
-                // switch (move) {
-                //     case "left":
-                //         return AgentAction.MOVE_WEST;
-                //     case "right":
-                //         return AgentAction.MOVE_EAST;
-                //     case "up":
-                //         return AgentAction.MOVE_SOUTH;  // flipped for north agent
-                //     case "down":
-                //         return AgentAction.MOVE_NORTH;  // flipped for north agent
-                //     default:
-                //         return AgentAction.DO_NOTHING;
-                // }
             } else if (agent == 2) {
                 switch (move) {
                     case "left":
@@ -188,6 +199,9 @@ public class wxd130130alz140030Agent extends Agent {
                     default:
                         return AgentAction.DO_NOTHING;
                 }
+
+                // TODO: adjust agentXLoc and agentYLoc
+                // TODO: check obstacles against potential maps
             } else {    // this should never happen...
                 useSimpleAgent = true;
                 return simpleAgent(inEnvironment);
