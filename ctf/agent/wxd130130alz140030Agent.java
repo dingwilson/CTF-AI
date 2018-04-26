@@ -43,7 +43,8 @@ public class wxd130130alz140030Agent extends Agent {
 
     private int clock = 0;  // move clock
     private int clock2=0;
-    public wxd130130alz140030() {
+    
+    public wxd130130alz140030Agent() {
         initializing = true;
         potentialMaps = setupPotentialMaps();
         path = new String[0];
