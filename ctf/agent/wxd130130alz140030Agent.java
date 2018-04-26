@@ -5,7 +5,7 @@ import ctf.agent.Agent;
 import ctf.common.AgentAction;
 import java.util.*;
 
-public class wxd130130alz140030 extends Agent {
+public class wxd130130alz140030Agent extends Agent {
     private int agent = 0;  // 0 = not found, 1 = north agent, 2 = south agent
     private boolean simpmap=false;
     private boolean empmap=false;
