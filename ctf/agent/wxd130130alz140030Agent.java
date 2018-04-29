@@ -83,9 +83,6 @@ public class wxd130130alz140030Agent extends Agent {
             checkPotentialMaps(inEnvironment);
 
             if (agent == 1) {   // agent = 1 = north agent
-                System.out.println(clock);
-                System.out.println(initializing);
-
                 if (!hasFoundMap) {
                     // TESTING FOR X
                     if ((clock == 1 && isSpawnEast && inEnvironment.isObstacleWestImmediate()) || (clock == 1 && !isSpawnEast && inEnvironment.isObstacleEastImmediate())) {
@@ -110,7 +107,6 @@ public class wxd130130alz140030Agent extends Agent {
                     }
 
                     // TESTING FOR SIMPLE
-                    // TODO: Loses to SimpleAgent
                     if (clock == 3 && inEnvironment.isObstacleSouthImmediate()) {
 
                         if (isSpawnEast) {
@@ -132,7 +128,6 @@ public class wxd130130alz140030Agent extends Agent {
                                 path = Arrays.copyOf(xwtWest, xwtWest.length);
                             }
                         } else {    // OTHERWISE EMPTY
-                            // TODO: Loses to SimpleAgent
                             if (isSpawnEast) {
                                 path = Arrays.copyOf(esEast, esEast.length);
                             } else {
@@ -207,28 +202,22 @@ public class wxd130130alz140030Agent extends Agent {
                 useSimpleAgent = true;
                 return simpleAgent(inEnvironment);
             }
-            //marker
-            String move = path[clock];
-            clock++;
-            if (agent == 1)
-            {
 
-                if (!hasdied&&isSpawnEast)
-                {
+            String move = path[clock];
+
+            clock++;
+
+            if (agent == 1) {
+                if (!hasdied&&isSpawnEast) {
                     move2 = Arrays.copyOf(sendmove, sendmove.length);
-                    System.out.println("This array");
                 }
-                if (hasdied&&isSpawnEast)
-                {
+                if (hasdied&&isSpawnEast) {
                     move2 = Arrays.copyOf(sedmove, sedmove.length);
                 }
-                if (!hasdied&&!isSpawnEast)
-                {
+                if (!hasdied&&!isSpawnEast) {
                     move2 = Arrays.copyOf(swndmove, swndmove.length);
-
                 }
-                if (hasdied&&!isSpawnEast)
-                {
+                if (hasdied&&!isSpawnEast) {
                     move2 = Arrays.copyOf(swdmove, swdmove.length);
                 }
                 
@@ -237,27 +226,25 @@ public class wxd130130alz140030Agent extends Agent {
                 }
 
                 switch (move2[clock2]) {
-                case "left":
-                    clock2++;
-                    return AgentAction.MOVE_WEST;
-                case "right":
-                    clock2++;
-                    return AgentAction.MOVE_EAST;
-                case "up":
-                    clock2++;
-                    return AgentAction.MOVE_NORTH;
-                case "down":
-                    clock2++;
-                    return AgentAction.MOVE_SOUTH;
-                case "mine":
-                    clock2++;
-                    return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
+                    case "left":
+                        clock2++;
+                        return AgentAction.MOVE_WEST;
+                    case "right":
+                        clock2++;
+                        return AgentAction.MOVE_EAST;
+                    case "up":
+                        clock2++;
+                        return AgentAction.MOVE_NORTH;
+                    case "down":
+                        clock2++;
+                        return AgentAction.MOVE_SOUTH;
+                    case "mine":
+                        clock2++;
+                        return AgentAction.PLANT_HYPERDEADLY_PROXIMITY_MINE;
                     default:
                         clock2++;
                         return AgentAction.DO_NOTHING;
                 }
-
-
             } else if (agent == 2) {
                 switch (move) {
                     case "left":
@@ -433,7 +420,6 @@ public class wxd130130alz140030Agent extends Agent {
                 }
 
                 if (!currentObstacles.equals(mapObstacles.toString())) {
-                    System.out.println("Agent " + agent + " removed map: " + pair.getKey());
                     mapIterator.remove();
                 }
             }
@@ -451,7 +437,6 @@ public class wxd130130alz140030Agent extends Agent {
         String[] numbersArray = numbers.split("\\s+");
 
         if (numbersArray.length != split * split) {  // this should never happen...
-            System.out.println("Error... The boolean array maps are not evenly split.");
             System.exit(1);
         }
 
